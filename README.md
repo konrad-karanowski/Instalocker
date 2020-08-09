@@ -1,2 +1,2 @@
 # Instalocker
-Instalocker programm for League of Legend
+Instalocker application for League of Legend
