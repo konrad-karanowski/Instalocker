@@ -5,6 +5,7 @@ from tkinter import messagebox
 
 from app.utils import WindowConfig, Manager
 from app.utils.setup_config import setup_configure
+from app.frames.running_window import RunningWindow
 
 
 class MainFrame(tk.Frame):
@@ -74,9 +75,6 @@ class MainFrame(tk.Frame):
         self.configs['command'] = self.configure_
         self.configs.grid(row=0, column=1, padx=10)
 
-        # create manager object to control bot
-        self.__manager = Manager()
-
     def start_(self) -> None:
         """
         Check if champion is chosen and start picking
@@ -92,12 +90,15 @@ class MainFrame(tk.Frame):
 
     def configure_(self) -> None:
         """
-        Perform configuration
+        Perform configuration using setup_configure function
 
         :return:
         """
-        setup_configure()
-        messagebox.showinfo('Success!', 'Configured successfully. Now do not change position of your LoL client.')
+        result = setup_configure()
+        if result:
+            messagebox.showinfo('Success!', 'Configured successfully. Now do not change position of your LoL client.')
+        else:
+            messagebox.showerror('Error!', 'Could not configure. Try again.')
 
     def lock_champion(self, champion, msg) -> None:
         """
@@ -108,5 +109,5 @@ class MainFrame(tk.Frame):
         
         :return:
         """
-        self.__manager.wait(champion, msg)
-
+        t = RunningWindow(champion, msg)
+        t.mainloop()

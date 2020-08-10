@@ -1,6 +1,5 @@
 import pyautogui
 import time
-import json
 from typing import List, Optional
 from pyscreeze import Box
 
@@ -35,11 +34,8 @@ class Instalocker:
         wait for img to be found in location and pick champion
     """
 
-    def __init__(self):
-        json_path = Configs.BASE_PATH + r'\config.json'
-        with open(json_path, 'r') as json_file:
-            self.__json = json.load(json_file)
-            print(type(self.__json))
+    def __init__(self, json):
+        self.__json = json
 
     def lock(self, champion: str) -> None:
         """
