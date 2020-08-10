@@ -2,6 +2,10 @@ import pyautogui
 import os
 import json
 import copy
+import time
+
+
+from app.utils import Configs
 
 
 path = os.path.abspath(os.curdir)
@@ -14,21 +18,25 @@ images = [
 paths = [path + r'\img\configs' + img for img in images]
 
 
-def locate(path_, text):
+def locate(path_: str, text: str, patience: int):
     """
     Locate image on screen
 
+    :param patience: time in seconds to wait for result of location
     :param path_: path to img
     :param text: text to print
     :return:
     """
     print(f'Locating: {text}')
+    c = time.time()
     while True:
         box = pyautogui.locateOnScreen(path_)
         if box:
             print(box)
             print('Located!')
             return list(box)
+        if time.time() - c >= patience:
+            raise RuntimeWarning(f'Run out of time for locating {text}')
 
 
 def process_img_position(box):
@@ -45,27 +53,32 @@ def process_img_position(box):
     return box
 
 
-def locate_pixel(path_, text):
+def locate_pixel(path_: str, text: str, patience: int):
     """
     Locate image on screen and return color to track and expected position
 
+    :param patience: time in seconds to wait for result of location
     :param path_: path to image
     :param text: text to print
     :return: position and color of pixel
     """
     print(f'Locating: {text}')
+    c = time.time()
     while True:
         box = pyautogui.locateOnScreen(path_)
         if box:
             print(box)
             break
+        if time.time() - c >= patience:
+            raise RuntimeWarning(f'Run out of time for locating {text}')
+
     position = pyautogui.center(box)
     color = pyautogui.pixel(*position)
     print('Located!')
     return [list(position), color]
 
 
-def setup_configure():
+def setup_configure() -> bool:
     """
     Setup configs locating positions used by bot:
     -champion entry position
@@ -74,13 +87,17 @@ def setup_configure():
     -pixel to track while waiting for match
     Then saves it in config.json
 
-    :return:
+    :return: if configuration was successful
     """
     # locate elements
-    champion_box = locate(paths[0], 'champ')
-    chat_box = locate(paths[1], 'chat')
-    entry_box = locate(paths[2], 'entry')
-    pixel_loc, pixel_color = locate_pixel(paths[3], 'pixel')
+    try:
+        champion_box = locate(paths[0], 'champ', Configs.CONF_CHAMP_PATIENCE)
+        chat_box = locate(paths[1], 'chat', Configs.CONF_CHAT_PATIENCE)
+        entry_box = locate(paths[2], 'entry', Configs.CONF_ENTRY_PATIENCE)
+        pixel_loc, pixel_color = locate_pixel(paths[3], 'pixel', Configs.CONF_PIXEL_PATIENCE)
+    except RuntimeWarning as exception:
+        print(exception)
+        return False
 
     # preprocess elements
     champion_box = process_img_position(champion_box)
@@ -102,3 +119,5 @@ def setup_configure():
     # save new configs
     with open(json_path, 'w') as json_file:
         json.dump(json_, json_file)
+
+    return True

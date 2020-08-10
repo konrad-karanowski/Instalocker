@@ -1,8 +1,6 @@
-from pynput.keyboard import Listener
 import json
 import pyautogui
 import time
-from pynput.keyboard import Key
 
 
 from app.utils import Configs
@@ -18,63 +16,25 @@ class Manager:
     __locker : Instalocker
         locker to pick champion
 
-    __champion : str
-        name of champion to pick
+    __json : dict
+        json with configurations
 
-    __msg : str
-        message to print
+    __is_running : bool
+        is waiting for match running
 
     Methods:
     -------------
-    listen()
-        wait for keyboard using pynput.keyboard.Listener
-
-    __on_press(key)
-        function to execute while listening
-
-    wait()
-        wait for game start using pixelMatch
     """
 
-    def __init__(self):
-        """
-        """
-        self.__locker = Instalocker()
+    def __init__(self, messanger):
+        self.__messanger = messanger
 
-    def listen(self, champion: str, msg: str) -> None:
-        """
-        Wait for key to click using pynput.keyboard.Listener
+        json_path = Configs.BASE_PATH + r'\config.json'
+        with open(json_path, 'r') as json_file:
+            self.__json = json.load(json_file)
 
-        :param champion: name of champion
-        :param msg: message to print
-        :return:
-        """
-        print('Ready to pick')
-        print(f'Champion: {champion}')
-        print(f'Msg: {msg}')
-        print("Press 'space' to insta-lock!")
-        with Listener(on_press=lambda key: self.__on_press(key, champion, msg)) as listener:
-            listener.join()
-
-    def __on_press(self, key: Key, champion: str, msg: str):
-        """
-        If user click START_KEY starts locking
-        If user click EXIT_KEY exit lobby process
-
-        Keys settings are available to customize in configs.py
-
-        :param champion: name of champion
-        :param msg: message to print
-        :param key: key from keyboard to use
-        :return:
-        """
-        if key == Configs.START_KEY:
-            self.__locker.lock(champion)
-            self.__locker.print_on_chat(msg)
-            print('Success!')
-            return False
-        elif key == Configs.EXIT_KEY:
-            return False
+        self.__locker = Instalocker(self.__json)
+        self.__is_running = False
 
     def wait(self, champion: str, msg: str):
         """
@@ -88,17 +48,28 @@ class Manager:
         :param msg: message to print on chat
         :return:
         """
-        json_path = Configs.BASE_PATH + r'\config.json'
-        with open(json_path, 'r') as json_file:
-            json_ = json.load(json_file)
+        self.__is_running = True
         print('Waiting for match...')
-        self.__locate_pixel(json_['PIXEL_COLOR'], json_['PIXEL_LOC'])
-        print('Match found!')
-        start = time.time()
-        self.__locker.lock(champion)
-        self.__locker.print_on_chat(msg)
-        stop = time.time()
-        print(f'Executed in {round(stop - start, 4)} seconds')
+        self.__messanger.print_message('Waiting for match...')
+        lock = self.__wait_for_match()
+        if lock:
+            self.__pick_champion(champion, msg)
+            self.__messanger.switch_button_text()
+        else:
+            print('Abandoned looking for match')
+            return
+
+    def __wait_for_match(self) -> bool:
+        """
+        Perform all actions before joining to lobby
+
+        TODO
+        -auto-accept
+
+        :return: was program cancelled
+        """
+        self.__locate_pixel(self.__json['PIXEL_COLOR'], self.__json['PIXEL_LOC'])
+        return self.__is_running
 
     def __locate_pixel(self, color, position) -> None:
         """
@@ -107,7 +78,30 @@ class Manager:
         :param position: expected position on screen
         :return:
         """
-        while True:
+        while True and self.__is_running:
             box = pyautogui.pixelMatchesColor(*position, expectedRGBColor=color)
             if box:
                 return
+
+    def __pick_champion(self, champion, msg) -> None:
+        """
+        Pick champion using Instalocker class
+
+        :param champion: name of champion
+        :param msg: message to print
+        :return:
+        """
+        self.__messanger.print_message('Match found!')
+        start = time.time()
+        self.__locker.lock(champion)
+        self.__locker.print_on_chat(msg)
+        stop = time.time()
+        self.__messanger.print_message(f'Executed in {round(stop - start, 4)} seconds')
+
+    def stop_running(self) -> None:
+        """
+        Stops running of the manager, can be used only to cancel waiting for locking!
+
+        :return:
+        """
+        self.__is_running = False
