@@ -85,7 +85,7 @@ class Instalocker:
         """
         c = time.time()
         while True:
-            box = pyautogui.locateOnScreen(img, region=location)
+            box = pyautogui.locateOnScreen(img, region=location, confidence=Configs.CONFIDENCE)
             if box:
                 return box
             elif time.time() - c >= patience:
