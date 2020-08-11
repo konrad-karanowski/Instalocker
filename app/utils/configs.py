@@ -28,6 +28,5 @@ class Configs:
 class WindowConfig:
 
     OPTIONS = [
-        'Ahri',
         'Yone'
     ]
