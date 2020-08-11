@@ -2,6 +2,7 @@ import pyautogui
 import time
 from typing import List, Optional
 from pyscreeze import Box
+import numpy as np
 
 
 from app.utils import Configs
@@ -76,7 +77,7 @@ class Instalocker:
         """
         Wait for image to appear in specific location, maximum time of waiting is specified by patience
 
-        If time of locating is higher than 5 seconds, Exception is raised
+        If time of locating is higher than patience, Exception is raised
 
         :param img: path to image
         :param location: location of image region with margin of error

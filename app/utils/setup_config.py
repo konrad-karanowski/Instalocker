@@ -30,11 +30,11 @@ def locate(path_: str, text: str, patience: int):
     print(f'Locating: {text}')
     c = time.time()
     while True:
-        box = pyautogui.locateOnScreen(path_)
+        box = pyautogui.locateOnScreen(path_, confidence=Configs.CONFIDENCE)
         if box:
             print(box)
             print('Located!')
-            return list(box)
+            return [int(i) for i in list(box)]
         if time.time() - c >= patience:
             raise RuntimeWarning(f'Run out of time for locating {text}')
 
@@ -65,17 +65,17 @@ def locate_pixel(path_: str, text: str, patience: int):
     print(f'Locating: {text}')
     c = time.time()
     while True:
-        box = pyautogui.locateOnScreen(path_, confidence=Configs.CONFIDENCE)
+        box = pyautogui.locateOnScreen(path_)
         if box:
             print(box)
             break
         if time.time() - c >= patience:
             raise RuntimeWarning(f'Run out of time for locating {text}')
-
     position = pyautogui.center(box)
-    color = pyautogui.pixel(*position)
+    int_position = [int(i) for i in list(position)]
+    color = pyautogui.pixel(*int_position)
     print('Located!')
-    return [list(position), color]
+    return [int_position, color]
 
 
 def setup_configure() -> bool:
@@ -101,8 +101,7 @@ def setup_configure() -> bool:
 
     # preprocess elements
     champion_box = process_img_position(champion_box)
-    entry_full_box = copy.deepcopy(entry_box)
-    chat_box = chat_box[:2]
+    chat_box = [int(i) for i in list(pyautogui.center(chat_box))]
     entry_box = entry_box[:2]
 
     # open json and write it
