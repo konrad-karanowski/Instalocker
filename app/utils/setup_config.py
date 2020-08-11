@@ -65,7 +65,7 @@ def locate_pixel(path_: str, text: str, patience: int):
     print(f'Locating: {text}')
     c = time.time()
     while True:
-        box = pyautogui.locateOnScreen(path_)
+        box = pyautogui.locateOnScreen(path_, confidence=Configs.CONFIDENCE)
         if box:
             print(box)
             break

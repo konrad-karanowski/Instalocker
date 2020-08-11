@@ -21,6 +21,9 @@ class Configs:
     CONF_CHAT_PATIENCE = 10
     CONF_PIXEL_PATIENCE = 10
 
+    # confidence of image
+    CONFIDENCE = 0.85
+
 
 class WindowConfig:
 
