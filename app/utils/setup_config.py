@@ -1,7 +1,6 @@
 import pyautogui
 import os
 import json
-import copy
 import time
 
 
@@ -95,8 +94,7 @@ def setup_configure() -> bool:
         chat_box = locate(paths[1], 'chat', Configs.CONF_CHAT_PATIENCE)
         entry_box = locate(paths[2], 'entry', Configs.CONF_ENTRY_PATIENCE)
         pixel_loc, pixel_color = locate_pixel(paths[3], 'pixel', Configs.CONF_PIXEL_PATIENCE)
-    except RuntimeWarning as exception:
-        print(exception)
+    except RuntimeWarning:
         return False
 
     # preprocess elements
@@ -108,6 +106,8 @@ def setup_configure() -> bool:
     json_path = path + r'\config.json'
     with open(json_path, 'r') as json_file:
         json_ = json.load(json_file)
+    if not json_:
+        return False
 
     json_['CHAMP_IMG_LOC'] = champion_box
     json_['CHAT_LOC'] = chat_box

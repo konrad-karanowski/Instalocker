@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import json
 
 
-from app.utils import WindowConfig, Manager
+from app.utils import WindowConfig, Configs
 from app.utils.setup_config import setup_configure
 from app.frames.running_window import RunningWindow
 
@@ -12,7 +13,7 @@ class MainFrame(tk.Frame):
     """
     Main frame of application
 
-    Buttons:
+    Widgets:
     -------------
     combobox : ttk.Combobox
         combobox to choose champion
@@ -109,5 +110,24 @@ class MainFrame(tk.Frame):
         
         :return:
         """
-        t = RunningWindow(champion, msg)
-        t.mainloop()
+        json_ = self.open_json()
+        if self.validate_configs(json_):
+            window = RunningWindow(champion, msg, json_)
+            window.mainloop()
+        else:
+            messagebox.showerror('Error!', 'Seems you did not make configure yet.')
+
+    def validate_configs(self, json_):
+        if json_:
+            for value in json_.values():
+                if not value:
+                    return False
+            return True
+        else:
+            return False
+
+    def open_json(self):
+        json_path = Configs.BASE_PATH + r'\config.json'
+        with open(json_path, 'r') as json_file:
+            json_ = json.load(json_file)
+        return json_

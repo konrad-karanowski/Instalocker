@@ -1,9 +1,7 @@
-import json
 import pyautogui
 import time
 
 
-from app.utils import Configs
 from app.utils import Instalocker
 
 
@@ -22,17 +20,30 @@ class Manager:
     __is_running : bool
         is waiting for match running
 
+    __messanger : tk.Frame
+        frame controlling model, used to put messages in window
+
     Methods:
     -------------
+    wait
+        wait for match start and lock if possible
+
+    __wait_for_match
+        wait for match and inform about this
+
+    __locate_pixel
+        perform actions before joining lobby
+
+    __pick_champion
+        pick champion using Instalocker class
+
+    stop_running
+        kills thread and cancel waiting for match
     """
 
-    def __init__(self, messanger):
+    def __init__(self, messanger, json_):
         self.__messanger = messanger
-
-        json_path = Configs.BASE_PATH + r'\config.json'
-        with open(json_path, 'r') as json_file:
-            self.__json = json.load(json_file)
-
+        self.__json = json_
         self.__locker = Instalocker(self.__json)
         self.__is_running = False
 
@@ -53,7 +64,10 @@ class Manager:
         self.__messanger.print_message('Waiting for match...')
         lock = self.__wait_for_match()
         if lock:
-            self.__pick_champion(champion, msg)
+            try:
+                self.__pick_champion(champion, msg)
+            except RuntimeError:
+                self.__messanger.print_message('Could not lock champion. Sorry.')
             self.__messanger.switch_button_text()
         else:
             print('Abandoned looking for match')

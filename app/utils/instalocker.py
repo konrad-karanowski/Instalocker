@@ -69,6 +69,7 @@ class Instalocker:
         :return:
         """
         pyautogui.click(location)
+        print(location)
         pyautogui.write(msg)
         if with_enter:
             pyautogui.press('enter')
@@ -90,7 +91,7 @@ class Instalocker:
             if box:
                 return box
             elif time.time() - c >= patience:
-                raise Exception
+                raise RuntimeError
 
     def __pick_champion(self, img: str, location: List[int], patience: int) -> None:
         """
