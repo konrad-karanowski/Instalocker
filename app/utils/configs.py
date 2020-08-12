@@ -18,6 +18,7 @@ class Configs:
 
     # confidence of image
     CONFIDENCE = 0.85
+    GREYSCALE = False
 
 
 class WindowConfig:
