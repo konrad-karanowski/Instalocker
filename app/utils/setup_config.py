@@ -1,41 +1,17 @@
 import pyautogui
 import os
+import numpy as np
 import json
-import time
-
-
-from app.utils import Configs
 
 
 path = os.path.abspath(os.curdir)
-images = [
-    r'\champ.bmp',
-    r'\chat.bmp',
-    r'\entry.bmp',
-    r'\pixel_rec.bmp'
-]
-paths = [path + r'\img\configs' + img for img in images]
 
 
-def locate(path_: str, text: str, patience: int):
-    """
-    Locate image on screen
-
-    :param patience: time in seconds to wait for result of location
-    :param path_: path to img
-    :param text: text to print
-    :return:
-    """
-    print(f'Locating: {text}')
-    c = time.time()
-    while True:
-        box = pyautogui.locateOnScreen(path_, confidence=Configs.CONFIDENCE)
-        if box:
-            print(box)
-            print('Located!')
-            return [int(i) for i in list(box)]
-        if time.time() - c >= patience:
-            raise RuntimeWarning(f'Run out of time for locating {text}')
+def preprocess_pixel(position, screen):
+    screen = np.array(screen, dtype=np.ndarray)
+    position = center_box(position)
+    rgb_color = screen[position[1], position[0], :]
+    return position, (int(rgb_color[0]), int(rgb_color[1]), int(rgb_color[2]))
 
 
 def process_img_position(box):
@@ -45,39 +21,18 @@ def process_img_position(box):
     :param box: box for location
     :return: processed box
     """
-    for i in range(2):
-        box[i] -= 10
-    for i in range(2, 4):
-        box[i] += 15
+    #box[0] -= 8
+    #box[1] += 10
+    #box[2] -= 8
+    #box[3] += 10
     return box
 
 
-def locate_pixel(path_: str, text: str, patience: int):
-    """
-    Locate image on screen and return color to track and expected position
-
-    :param patience: time in seconds to wait for result of location
-    :param path_: path to image
-    :param text: text to print
-    :return: position and color of pixel
-    """
-    print(f'Locating: {text}')
-    c = time.time()
-    while True:
-        box = pyautogui.locateOnScreen(path_)
-        if box:
-            print(box)
-            break
-        if time.time() - c >= patience:
-            raise RuntimeWarning(f'Run out of time for locating {text}')
-    position = pyautogui.center(box)
-    int_position = [int(i) for i in list(position)]
-    color = pyautogui.pixel(*int_position)
-    print('Located!')
-    return [int_position, color]
+def center_box(box):
+    return [box[0] + int(box[2] / 2), box[1] + int(box[3] / 2)]
 
 
-def setup_configure() -> bool:
+def setup_configure(elements, screen) -> bool:
     """
     Setup configs locating positions used by bot:
     -champion entry position
@@ -89,18 +44,15 @@ def setup_configure() -> bool:
     :return: if configuration was successful
     """
     # locate elements
-    try:
-        champion_box = locate(paths[0], 'champ', Configs.CONF_CHAMP_PATIENCE)
-        chat_box = locate(paths[1], 'chat', Configs.CONF_CHAT_PATIENCE)
-        entry_box = locate(paths[2], 'entry', Configs.CONF_ENTRY_PATIENCE)
-        pixel_loc, pixel_color = locate_pixel(paths[3], 'pixel', Configs.CONF_PIXEL_PATIENCE)
-    except RuntimeWarning:
-        return False
+    champion_box = elements[0]
+    entry_box = elements[1]
+    chat_box = elements[2]
+    pixel_loc, pixel_color = preprocess_pixel(elements[3], screen)
 
     # preprocess elements
     champion_box = process_img_position(champion_box)
     chat_box = [int(i) for i in list(pyautogui.center(chat_box))]
-    entry_box = entry_box[:2]
+    entry_box = center_box(entry_box)
 
     # open json and write it
     json_path = path + r'\config.json'

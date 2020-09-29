@@ -36,7 +36,7 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         self.title("Instalocker")
-        self.geometry('380x170')
+        self.geometry('430x220')
         self.resizable(False, False)
 
         # main container

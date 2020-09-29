@@ -7,6 +7,8 @@ import json
 from app.utils import WindowConfig, Configs
 from app.utils.setup_config import setup_configure
 from app.frames.running_window import RunningWindow
+from app.frames.config_window import ConfigWindow
+from app.frames.update_window import UpdateWindow
 
 
 class MainFrame(tk.Frame):
@@ -59,9 +61,13 @@ class MainFrame(tk.Frame):
         self.champion = tk.StringVar()
 
         # create widgets
+        self.label_champion = ttk.Label(self, text='Choose your champion: ')
+        self.label_champion.pack()
         self.combobox = ttk.Combobox(self, textvariable=self.champion, value=self.options, width=38)
         self.combobox.pack(pady=12)
 
+        self.msg_label = ttk.Label(self, text='Enter message to be written on chat: ')
+        self.msg_label.pack()
         self.text = tk.Text(self, width=33, height=3)
         self.text.pack()
 
@@ -75,6 +81,10 @@ class MainFrame(tk.Frame):
         self.configs = ttk.Button(buttons_container, text='Config')
         self.configs['command'] = self.configure_
         self.configs.grid(row=0, column=1, padx=10)
+
+        self.hard_config = ttk.Button(buttons_container, text='Update')
+        self.hard_config['command'] = self.champion_configure_
+        self.hard_config.grid(row=0, column=2, padx=10)
 
     def start_(self) -> None:
         """
@@ -95,11 +105,13 @@ class MainFrame(tk.Frame):
 
         :return:
         """
-        result = setup_configure()
-        if result:
-            messagebox.showinfo('Success!', 'Configured successfully. Now do not change position of your LoL client.')
-        else:
-            messagebox.showerror('Error!', 'Could not configure. Try again.')
+        messagebox.showinfo('Configuration', 'Enter practise tool and click "Ok", when ready!')
+        window = ConfigWindow()
+        window.mainloop()
+
+    def champion_configure_(self):
+        window = UpdateWindow()
+        window.mainloop()
 
     def lock_champion(self, champion, msg) -> None:
         """
