@@ -15,8 +15,9 @@ PATH = os.path.abspath(os.curdir)
 
 class UpdateWindow(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.parent = parent
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -40,8 +41,8 @@ class UpdateFrame(tk.Frame):
 
         # create list of champions
         json_ = self.open_json()
-        updated = WindowConfig.OPTIONS
-        self.to_update = [champion for champion in json_['CHAMPIONS'] if champion not in updated]
+        self.updated = WindowConfig.OPTIONS
+        self.to_update = [champion for champion in json_['CHAMPIONS'] if champion not in self.updated]
         print(self.to_update)
 
         # get parameters
@@ -65,6 +66,7 @@ class UpdateFrame(tk.Frame):
             z = time.time()
             if c - z >= 80:
                 break
+        self.controller.parent.update_champions(self.updated)
         messagebox.showinfo('Success!', f'Updated {i + 1} champions')
         self.controller.destroy()
 
@@ -95,6 +97,7 @@ class UpdateFrame(tk.Frame):
         if img != dummy:
             img.save(fr'{PATH}\img\champions\{champion}.png')
             print('Saved!')
+            self.updated.append(champion)
 
     def get_dummy(self):
         self.print_champion_name('xxxxx')

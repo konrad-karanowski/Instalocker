@@ -110,7 +110,7 @@ class MainFrame(tk.Frame):
         window.mainloop()
 
     def champion_configure_(self):
-        window = UpdateWindow()
+        window = UpdateWindow(self)
         window.mainloop()
 
     def lock_champion(self, champion, msg) -> None:
@@ -143,3 +143,6 @@ class MainFrame(tk.Frame):
         with open(json_path, 'r') as json_file:
             json_ = json.load(json_file)
         return json_
+
+    def update_champions(self, champions):
+        self.combobox['value'] = champions

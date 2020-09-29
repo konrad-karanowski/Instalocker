@@ -47,7 +47,7 @@ class Instalocker:
         :param champion: name of champion
         :return: None
         """
-        champion_img_path = Configs.BASE_PATH + fr'\img\champions\{champion.capitalize()}.bmp'
+        champion_img_path = Configs.BASE_PATH + fr'\img\champions\{champion.capitalize()}.png'
         self.__print_msg(champion, self.__json['CHAMP_ENTRY_LOC'])
         self.__pick_champion(champion_img_path, self.__json['CHAMP_IMG_LOC'], Configs.IMG_FIND_PATIENCE)
 

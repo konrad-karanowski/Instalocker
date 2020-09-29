@@ -23,5 +23,5 @@ class Configs:
 class WindowConfig:
 
     OPTIONS = [
-        'Yone'
+        'Aatrox'
     ]
