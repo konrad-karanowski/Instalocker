@@ -1,5 +1,6 @@
 import pyautogui
 import time
+import numpy as np
 
 
 from app.utils import Instalocker
@@ -93,9 +94,17 @@ class Manager:
         :return:
         """
         while True and self.__is_running:
-            box = pyautogui.pixelMatchesColor(*position, expectedRGBColor=color)
-            if box:
+            found = self.__pixel_match_color(position, color)
+            if found:
                 return
+
+    def __pixel_match_color(self, position, expected_rgb):
+        screen = np.array(pyautogui.screenshot())
+        rgb_color = screen[position[1], position[0], :]
+        found = np.equal(rgb_color, expected_rgb).all()
+        print(rgb_color)
+        print(found)
+        return found
 
     def __pick_champion(self, champion, msg) -> None:
         """

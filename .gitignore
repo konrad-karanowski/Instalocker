@@ -3,3 +3,4 @@ __pycache__
 venv
 locate.py
 test.py
+*.png

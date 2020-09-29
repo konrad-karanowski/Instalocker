@@ -62,13 +62,11 @@ class UpdateFrame(tk.Frame):
         updated = list()
         c = time.time()
         for i, champion in enumerate(to_update):
-            print(champion)
             self.configure_one(champion)
             updated.append(updated)
             z = time.time()
             if c - z >= 80:
                 break
-        print('Coś')
         self.save_json(updated)
         self.controller.parent.setup_options()
         messagebox.showinfo('Success!', f'Updated {i + 1} champions')
@@ -104,7 +102,6 @@ class UpdateFrame(tk.Frame):
         time.sleep(1)
         img = pyautogui.screenshot(region=self.champ_loc)
         img.save(fr'{PATH}\img\champions\{champion}.png')
-        print('Saved!')
 
     def parse_text(self):
         text = self.text.get(0.0, tk.END)
