@@ -150,4 +150,4 @@ class MainFrame(tk.Frame):
 
     def setup_options(self):
         champions = glob.glob(fr'{PATH}\img\champions\*.png')
-        self.combobox['value'] = [os.path.basename(champion).strip('.png') for champion in champions]
+        self.combobox['value'] = [os.path.basename(champion)[:-4] for champion in champions]

@@ -106,4 +106,4 @@ class UpdateFrame(tk.Frame):
     def parse_text(self):
         text = self.text.get(0.0, tk.END)
         split = text.split(',')
-        return [element.strip('\n').strip(' ') for element in split]
+        return [element.strip('\n').replace(' ', '') for element in split]
