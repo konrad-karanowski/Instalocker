@@ -2,7 +2,6 @@ import pyautogui
 import time
 from typing import List, Optional
 from pyscreeze import Box
-import numpy as np
 
 
 from app.utils import Configs
@@ -86,6 +85,7 @@ class Instalocker:
         :return: location of image
         """
         c = time.time()
+        # adjust region
         location = (location[0] - 10, location[1] - 10, location[2] + 20, location[3] + 20)
         while True:
             box = pyautogui.locateOnScreen(img, region=location, confidence=Configs.CONFIDENCE)

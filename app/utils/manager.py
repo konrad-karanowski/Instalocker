@@ -1,6 +1,8 @@
 import pyautogui
 import time
 import numpy as np
+from PIL import Image
+import os
 
 
 from app.utils import Instalocker
@@ -94,7 +96,7 @@ class Manager:
         :return:
         """
         while True and self.__is_running:
-            found = self.__pixel_match_color(position, color)
+            found = pyautogui.locateOnScreen(os.path.abspath(os.curdir) + r'\img\config\match.png', region=position)
             if found:
                 return
 

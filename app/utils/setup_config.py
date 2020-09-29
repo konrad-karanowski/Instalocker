@@ -14,6 +14,13 @@ def preprocess_pixel(position, screen):
     return position, (int(rgb_color[0]), int(rgb_color[1]), int(rgb_color[2]))
 
 
+def save_image(position, screen):
+    screen = screen.crop((position[0], position[1], position[0] + position[2], position[1] + position[3]))
+    print(screen)
+    screen.save(path + r'\img\config\match.png')
+    return position
+
+
 def process_img_position(box):
     """
     Process location of expected champion location adding margin of error
@@ -47,7 +54,8 @@ def setup_configure(elements, screen) -> bool:
     champion_box = elements[0]
     entry_box = elements[1]
     chat_box = elements[2]
-    pixel_loc, pixel_color = preprocess_pixel(elements[3], screen)
+    #pixel_loc, pixel_color = preprocess_pixel(elements[3], screen)
+    accept_loc = save_image(elements[3], screen)
 
     # preprocess elements
     champion_box = process_img_position(champion_box)
@@ -64,8 +72,8 @@ def setup_configure(elements, screen) -> bool:
     json_['CHAMP_IMG_LOC'] = champion_box
     json_['CHAT_LOC'] = chat_box
     json_['CHAMP_ENTRY_LOC'] = entry_box
-    json_['PIXEL_LOC'] = pixel_loc
-    json_['PIXEL_COLOR'] = pixel_color
+    json_['PIXEL_LOC'] = accept_loc
+    #json_['PIXEL_COLOR'] = pixel_color
 
     # save new configs
     with open(json_path, 'w') as json_file:
