@@ -84,6 +84,11 @@ class ConfigFrame(tk.Frame):
         return answer
 
     def draw_rectangle(self, event):
+        """
+        Draw rectangle and end process
+        :param event:
+        :return:
+        """
         if self.counter == 0:
             self.x1 = event.x
             self.y1 = event.y
@@ -103,6 +108,10 @@ class ConfigFrame(tk.Frame):
                 self.canvas.delete(prev)
 
     def add_element(self):
+        """
+        Add box to box list and increment switcher counter
+        :return:
+        """
         self.switcher_counter += 1
         box = [self.x1, self.y1, self.x2 - self.x1, self.y2 - self.y1]
         self.configs.append(box)

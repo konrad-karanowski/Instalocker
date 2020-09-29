@@ -7,9 +7,6 @@ import os
 import json
 
 
-from app.utils import WindowConfig
-
-
 PATH = os.path.abspath(os.curdir)
 
 
@@ -22,7 +19,7 @@ class UpdateWindow(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         self.title("")
-        self.geometry(f'250x150')
+        self.geometry(f'400x320')
         self.resizable(False, False)
         self.lift()
 
@@ -41,32 +38,39 @@ class UpdateFrame(tk.Frame):
 
         # create list of champions
         json_ = self.open_json()
-        self.updated = WindowConfig.OPTIONS
-        self.to_update = [champion for champion in json_['CHAMPIONS'] if champion not in self.updated]
-        print(self.to_update)
 
         # get parameters
         self.entry_loc = json_['CHAMP_ENTRY_LOC']
         self.champ_loc = json_['CHAMP_IMG_LOC']
 
         # create widgets
-        self.label = ttk.Label(self, text="Enter practise tool and click 'Update' when ready.")
+        self.label = ttk.Label(self, text="""
+    Print champions names (separated by ','), 
+    enter practise tool and click 'Update' when ready."""
+                               )
         self.label.pack()
 
-        self.button = ttk.Button(self, text='Update champions list')
+        self.text = tk.Text(self, height=10, width=35)
+        self.text.pack()
+
+        self.button = ttk.Button(self, text='Update')
         self.button['command'] = self.configure_champion
         self.button.pack()
 
     def configure_champion(self):
-        img = self.get_dummy()
+        to_update = self.parse_text()
+        updated = list()
         c = time.time()
-        for i, champion in enumerate(self.to_update):
+        for i, champion in enumerate(to_update):
             print(champion)
-            self.configure_one(champion, img)
+            self.configure_one(champion)
+            updated.append(updated)
             z = time.time()
             if c - z >= 80:
                 break
-        self.controller.parent.update_champions(self.updated)
+        print('Coś')
+        self.save_json(updated)
+        self.controller.parent.setup_options()
         messagebox.showinfo('Success!', f'Updated {i + 1} champions')
         self.controller.destroy()
 
@@ -76,31 +80,33 @@ class UpdateFrame(tk.Frame):
             json_ = json.load(json_file)
         return json_
 
-    def configure_one(self, champion, dummy):
+    def save_json(self, champions):
+        json_path = PATH + r'\config.json'
+        with open(json_path, 'r') as json_file:
+            json_ = json.load(json_file)
+        json_['CHAMPIONS'] = champions
+
+    def configure_one(self, champion):
         self.print_champion_name(champion)
-        self.take_screen(champion, dummy)
-        num_bs = len(champion)
-        self.clear_champion(num_bs)
+        self.take_screen(champion)
+        self.clear_champion()
 
     def print_champion_name(self, champion):
         pyautogui.click(self.entry_loc)
         pyautogui.write(champion)
 
-    def clear_champion(self, num_backspaces):
+    def clear_champion(self):
         pyautogui.click(self.entry_loc)
         pyautogui.click(self.entry_loc)
         pyautogui.press('backspace')
 
-    def take_screen(self, champion, dummy):
+    def take_screen(self, champion):
         time.sleep(1)
         img = pyautogui.screenshot(region=self.champ_loc)
-        if img != dummy:
-            img.save(fr'{PATH}\img\champions\{champion}.png')
-            print('Saved!')
-            self.updated.append(champion)
+        img.save(fr'{PATH}\img\champions\{champion}.png')
+        print('Saved!')
 
-    def get_dummy(self):
-        self.print_champion_name('xxxxx')
-        img = pyautogui.screenshot(region=self.champ_loc)
-        return img
-
+    def parse_text(self):
+        text = self.text.get(0.0, tk.END)
+        split = text.split(',')
+        return [element.strip('\n').strip(' ') for element in split]

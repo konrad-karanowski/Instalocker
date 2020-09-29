@@ -2,13 +2,17 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import json
+import os
+import glob
 
 
-from app.utils import WindowConfig, Configs
-from app.utils.setup_config import setup_configure
+from app.utils import Configs
 from app.frames.running_window import RunningWindow
 from app.frames.config_window import ConfigWindow
 from app.frames.update_window import UpdateWindow
+
+
+PATH = os.path.abspath(os.curdir)
 
 
 class MainFrame(tk.Frame):
@@ -57,14 +61,14 @@ class MainFrame(tk.Frame):
         self.controller = controller
 
         # create variables
-        self.options = WindowConfig.OPTIONS
         self.champion = tk.StringVar()
 
         # create widgets
         self.label_champion = ttk.Label(self, text='Choose your champion: ')
         self.label_champion.pack()
-        self.combobox = ttk.Combobox(self, textvariable=self.champion, value=self.options, width=38)
+        self.combobox = ttk.Combobox(self, textvariable=self.champion, width=38)
         self.combobox.pack(pady=12)
+        self.setup_options()
 
         self.msg_label = ttk.Label(self, text='Enter message to be written on chat: ')
         self.msg_label.pack()
@@ -144,5 +148,6 @@ class MainFrame(tk.Frame):
             json_ = json.load(json_file)
         return json_
 
-    def update_champions(self, champions):
-        self.combobox['value'] = champions
+    def setup_options(self):
+        champions = glob.glob(fr'{PATH}\img\champions\*.png')
+        self.combobox['value'] = [os.path.basename(champion).strip('.png') for champion in champions]
