@@ -3,11 +3,13 @@ from tkinter import ttk
 from tkinter import messagebox
 import time
 import pyautogui
-import os
 import json
 
 
-PATH = os.path.abspath(os.curdir)
+from app.utils import Configs
+
+
+PATH = Configs.BASE_PATH
 
 
 class UpdateWindow(tk.Tk):

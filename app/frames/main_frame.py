@@ -12,7 +12,7 @@ from app.frames.config_window import ConfigWindow
 from app.frames.update_window import UpdateWindow
 
 
-PATH = os.path.abspath(os.curdir)
+PATH = Configs.BASE_PATH
 
 
 class MainFrame(tk.Frame):

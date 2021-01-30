@@ -1,7 +1,5 @@
 import pyautogui
 import time
-import numpy as np
-from PIL import Image
 import os
 
 
@@ -85,10 +83,10 @@ class Manager:
 
         :return: was program cancelled
         """
-        self.__locate_pixel(self.__json['PIXEL_COLOR'], self.__json['PIXEL_LOC'])
+        self.__locate_match(self.__json['MATCH_LOC'])
         return self.__is_running
 
-    def __locate_pixel(self, color, position) -> None:
+    def __locate_match(self, position) -> None:
         """
         Locate pixel that informs that match is started
         :param color: pixel color
@@ -99,14 +97,6 @@ class Manager:
             found = pyautogui.locateOnScreen(os.path.abspath(os.curdir) + r'\img\config\match.png', region=position)
             if found:
                 return
-
-    def __pixel_match_color(self, position, expected_rgb):
-        screen = np.array(pyautogui.screenshot())
-        rgb_color = screen[position[1], position[0], :]
-        found = np.equal(rgb_color, expected_rgb).all()
-        print(rgb_color)
-        print(found)
-        return found
 
     def __pick_champion(self, champion, msg) -> None:
         """

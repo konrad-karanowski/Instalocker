@@ -18,10 +18,3 @@ class Configs:
 
     # confidence of image
     CONFIDENCE = 0.95
-
-
-class WindowConfig:
-
-    OPTIONS = [
-        'Aatrox'
-    ]
